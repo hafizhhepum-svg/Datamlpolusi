@@ -51,19 +51,21 @@ void grafik1() {
 
     TGraph *gr = new TGraph(n,&x_vals[0],&y_vals[0]);
 
-    gr->SetTitle(";PM2.5 Observed;PM2.5 Predicted");
+    gr->SetTitle(";PM2.5 Observed [AQI];PM2.5 Predicted [AQI]");
 
     // marker open circle
     gr->SetMarkerStyle(24);
     gr->SetMarkerSize(0.7);
     gr->SetMarkerColor(kBlue);
 
-    gr->Draw("AP");
-
     // set range axis
     gr->GetXaxis()->SetRangeUser(0,500);
     gr->GetYaxis()->SetRangeUser(0,500);
 
+    gr->GetXaxis()->SetNdivisions(410);
+    gr->GetYaxis()->SetNdivisions(410);
+
+    // nDivisions
     // axis styling
     gr->GetXaxis()->CenterTitle();
     gr->GetYaxis()->CenterTitle();
@@ -76,11 +78,9 @@ void grafik1() {
 
     // LINEAR FIT
     TF1 *fit = new TF1("fit","pol1",0,500);
-
-    gr->Fit(fit,"R");
-
     fit->SetLineColor(kRed);
-    fit->SetLineWidth(2);
+    fit->SetLineWidth(4);
+    gr->Fit(fit,"R");
 
     double c = fit->GetParameter(0);
     double m = fit->GetParameter(1);
@@ -120,13 +120,11 @@ void grafik1() {
     leg->SetFillStyle(0);
     leg->SetTextSize(0.035);
 
-    leg->Draw();
-
     // -----------------------
     // R2 KANAN ATAS
     // -----------------------
 
-    TPaveText *pt = new TPaveText(0.75,0.85,0.9,0.92,"NDC");
+    TPaveText *pt = new TPaveText(0.6,0.7,0.6,0.88,"NDC");
 
     pt->AddText(Form("R^{2} = %.3f",R2));
 
@@ -134,7 +132,11 @@ void grafik1() {
     pt->SetBorderSize(0);
     pt->SetTextSize(0.04);
 
+    c1->cd(1);
+    gr->Draw("AP");
+    leg->Draw();
     pt->Draw();
 
-    c1->SaveAs("scatter_PM25_fit.png");
+    c1->SaveAs("./output/scatter_PM25_fit.png");
+    c1->SaveAs("./output/scatter_PM25_fit.pdf");
 }
